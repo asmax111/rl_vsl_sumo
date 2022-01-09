@@ -1,0 +1,50 @@
+<additional>
+	<inductionLoop id='rout1_01loop' lane='486885259_0' pos='50' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_02loop' lane='486885259_1' pos='50' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_03loop' lane='486885259_2' pos='50' freq='100' file='data/resultsOfDetectors.xml'/>
+	
+	<inductionLoop id='rout1_11loop' lane='154190805_0' pos='50' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_12loop' lane='154190805_1' pos='50' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_13loop' lane='154190805_2' pos='50' freq='100' file='data/resultsOfDetectors.xml'/>
+	
+	<inductionLoop id='rout1_011loop' lane='486885259_0' pos='100' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_021loop' lane='486885259_1' pos='100' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_031loop' lane='486885259_2' pos='100' freq='100' file='data/resultsOfDetectors.xml'/>
+	
+	<inductionLoop id='rout1_111loop' lane='154190805_0' pos='100' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_121loop' lane='154190805_1' pos='100' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_131loop' lane='154190805_2' pos='100' freq='100' file='data/resultsOfDetectors.xml'/>
+
+	<inductionLoop id='rout1_0111loop' lane='486885259_0' pos='150' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_0211loop' lane='486885259_1' pos='150' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_0311loop' lane='486885259_2' pos='150' freq='100' file='data/resultsOfDetectors.xml'/>
+	
+	<inductionLoop id='rout1_1111loop' lane='154190805_0' pos='150' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_1211loop' lane='154190805_1' pos='150' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_1311loop' lane='154190805_2' pos='150' freq='100' file='data/resultsOfDetectors.xml'/>
+
+	<inductionLoop id='rout1_0112loop' lane='486885259_0' pos='200' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_0212loop' lane='486885259_1' pos='200' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_0312loop' lane='486885259_2' pos='200' freq='100' file='data/resultsOfDetectors.xml'/>
+	
+	<inductionLoop id='rout1_1112loop' lane='154190805_0' pos='200' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_1212loop' lane='154190805_1' pos='200' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_1312loop' lane='154190805_2' pos='200' freq='100' file='data/resultsOfDetectors.xml'/>
+
+	<inductionLoop id='bottlneck11_loop' lane='486885259_0' pos='250' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='bottlneck21_loop' lane='486885259_1' pos='250' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='bottlneck31_loop' lane='486885259_2' pos='250' freq='100' file='data/resultsOfDetectors.xml'/>
+
+	<inductionLoop id='bottlneck1_loop' lane='154190805_0' pos='250' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='bottlneck2_loop' lane='154190805_1' pos='250' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='bottlneck3_loop' lane='154190805_2' pos='250' freq='100' file='data/resultsOfDetectors.xml'/>
+
+	<inductionLoop id='rout1_2222loop' lane='486885259_0' pos='300' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_2223loop' lane='486885259_1' pos='300' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_2224loop' lane='486885259_2' pos='300' freq='100' file='data/resultsOfDetectors.xml'/>
+	
+	<inductionLoop id='rout1_2225loop' lane='154190805_0' pos='300' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_2226loop' lane='154190805_1' pos='300' freq='100' file='data/resultsOfDetectors.xml'/>
+	<inductionLoop id='rout1_2227loop' lane='154190805_2' pos='300' freq='100' file='data/resultsOfDetectors.xml'/>
+
+</additional>
