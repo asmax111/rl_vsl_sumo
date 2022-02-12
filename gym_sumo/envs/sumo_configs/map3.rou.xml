@@ -1,6 +1,6 @@
 <!-- Right turn - describe the different routes and vehicles on these routes -->
 <routes>
-	<vType id="type1" accel="0.8" decel="1"  numLanes="3" carFollowModel="Krauss"  sigma="0.5" length="5" maxSpeed="33"/>
+	<vType id="type1" numLanes="3" carFollowModel="Krauss"  sigma="0.5" length="5" maxSpeed="33"/>
 	<vehicle id="veh1" type="type1" depart="0">
 		<route edges="141130184"/>
 	</vehicle>

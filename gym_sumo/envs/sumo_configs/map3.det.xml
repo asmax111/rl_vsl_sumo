@@ -78,4 +78,6 @@
 	<inductionLoop id='loop10r2l1' lane='141131874_0' pos='1000' freq='100' file='data/resultsOfDetectors.xml'/>
 	<inductionLoop id='loop10r2l2' lane='141131874_1' pos='1000' freq='100' file='data/resultsOfDetectors.xml'/>
 	<inductionLoop id='loop10r2l3' lane='141131874_2' pos='1000' freq='100' file='data/resultsOfDetectors.xml'/>
+
+	<edgeData id="edgeData1" file="data/resultsOfDetectors.xml" freq= "100"/>
 </additional>

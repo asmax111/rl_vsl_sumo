@@ -66,7 +66,7 @@ def plot_action_values(action_values):
          (0.05, 1.45), (1.05, 1.45), (2.05, 1.45), (3.05, 1.45), (4.05, 1.45),
          (0.05, 0.45), (1.05, 0.45), (2.05, 0.45), (3.05, 0.45), (4.05, 0.45)]]
 
-    fig, ax = plt.subplots(figsize=(9, 9))
+    fig, ax = plt.subplots(figsize=(6, 6))
     tripcolor = quatromatrix(action_values, ax=ax,
                              triplotkw={"color": "k", "lw": 1}, tripcolorkw={"cmap": "coolwarm"})
     ax.margins(0)
@@ -77,7 +77,7 @@ def plot_action_values(action_values):
         for i, (xi, yi) in enumerate(av):
             plt.text(xi, yi, round(action_values[:, :, j].flatten()[i], 2), size=10, color="w", weight="bold")
 
-    plt.title("Action values Q(s,a)", size=18)
+    plt.title("Action values Q(s,a)", size=12)
     plt.tight_layout()
     plt.show()
 
@@ -95,10 +95,10 @@ def quatromatrix(action_values, ax=None, triplotkw=None, tripcolorkw=None):
             k = i * m + j
             A[k * 5:(k + 1) * 5, :] = np.c_[a[:, 0] + j, a[:, 1] + i]
             Tr[k * 4:(k + 1) * 4, :] = tr + k * 5
-    C = np.c_[action_values[:, :, 3].flatten(), action_values[:, :, 2].flatten(),
-              action_values[:, :, 1].flatten(), action_values[:, :, 0].flatten()].flatten()
+    C = np.c_[action_values[ :, 3].flatten(), action_values[ :, 2].flatten(),
+              action_values[ :, 1].flatten(), action_values[ :, 0].flatten()].flatten()
 
-    ax.triplot(A[:, 0], A[:, 1], Tr, **triplotkw)
+    ax.j(A[:, 0], A[:, 1], Tr, **triplotkw)
     tripcolor = ax.tripcolor(A[:, 0], A[:, 1], Tr, facecolors=C, **tripcolorkw)
     return tripcolor
 
