@@ -58,7 +58,7 @@ class QLAgent:
 
     def discretize(self,sample, grid):
         discretized_sample= []
-        return list(np.digitize(sample_, grid_) for sample_, grid_ in zip(sample, grid))
+        return list(np.digitize(sample, grid))
 
     def plot_q_table(self,q_table):
         q_image = np.max(q_table, axis = 2)
