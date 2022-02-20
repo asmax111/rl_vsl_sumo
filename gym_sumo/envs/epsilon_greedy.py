@@ -22,7 +22,7 @@ class EpsilonGreedy:
             print(q_table[state])
             action = action_space[index_action]
 
-        self.epsilon = max(self.epsilon*self.decay, self.min_epsilon)
+        #self.epsilon = max(self.epsilon*self.decay, self.min_epsilon)
         #print(self.epsilon)
         return action
 
