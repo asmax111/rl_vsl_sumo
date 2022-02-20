@@ -9,10 +9,9 @@
 						<additional-files value="map3.det.xml"/>
 				    </input>
 
-				    <!--<time>
-				         The beginning and end times are overwritten if running from python using traci 
+				    <time>
 						<step-length value="0.5"/>
-				    </time>-->
+				    </time>
 
 					<!--<output>
 						<summary-output value="output_sumo.xml"/>

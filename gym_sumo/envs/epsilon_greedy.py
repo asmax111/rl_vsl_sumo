@@ -4,19 +4,22 @@ from gym import spaces
 
 class EpsilonGreedy:
 
-    def __init__(self, initial_epsilon=1.0, min_epsilon=0.0, decay=0.99):
+    def __init__(self, initial_epsilon=0.05, min_epsilon=0.0, decay=0.99):
         self.initial_epsilon = initial_epsilon
         self.epsilon = initial_epsilon
         self.min_epsilon = min_epsilon
         self.decay = decay
 
     def choose(self, q_table, state, action_space):
-        randomRow = np.random.randint(action_space.size, size=1)
+        randomRow = np.random.randint(len(action_space), size=1)
         action = action_space[randomRow[0]]
-        if np.random.rand() < self.epsilon:
+        if np.random.random() < self.epsilon:
+            print("exploring action")
             action = action_space[randomRow[0]]
         else:
-            action = np.argmax(q_table[state])
+            print("maximizing action")
+            index_action = np.argmax(q_table[state])
+            action = action_space[index_action]
 
         self.epsilon = max(self.epsilon*self.decay, self.min_epsilon)
         #print(self.epsilon)

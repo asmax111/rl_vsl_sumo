@@ -1,3 +1,4 @@
+from turtle import st
 from gym import Env
 from gym import error, spaces, utils
 from gym.utils import seeding
@@ -16,15 +17,19 @@ import traci.constants as tc
 
 import os, sys, subprocess
 action_space= np.array([19, 22, 25, 28, 31, 33])
-observation_space = spaces.Tuple([spaces.Box(0,100, shape=(1,), dtype='float'),spaces.Box(0,3000, shape=(1,), dtype='float')])
-sumoConfig = "C://PHD/Workspace/gym_sumo_vsl_maroc/gym_sumo/envs/sumo_configs/maroc.sumocfg"
-sumoBinary = "C://Program Files (x86)/Eclipse/Sumo/bin/sumo-gui.exe"
+#observation_space = spaces.Tuple([spaces.Box(0,100, shape=(1,), dtype='float'),spaces.Box(0,3000, shape=(1,), dtype='float')])
+observation_space = spaces.Box(low=np.array([0,0]), high=np.array([3000,50]))
+sumoConfig = "/users/asmae/Desktop/PHD/rl_vsl_sumo/rl_vsl_sumo/gym_sumo/envs/sumo_configs/maroc.sumocfg"
+sumoBinary = "/opt/homebrew/opt/sumo/share/sumo/bin/sumo-gui"
 class SUMOEnv(Env):
 	metadata = {'render.modes': ['human', 'rgb_array','state_pixels']}
 	#Discrete speeds for VSL
 	action_space= np.array([19, 22, 25, 28, 31, 33])
-	observation_space = spaces.Tuple([spaces.Box(0,100, shape=(1,), dtype='float'),spaces.Box(0,3000, shape=(1,), dtype='float')])
-	def __init__(self,mode='gui',simulation_end=3600):
+	#observation_space = spaces.Tuple([spaces.Box(0,100, shape=(1,), dtype='float'),spaces.Box(0,3000, shape=(1,), dtype='float')])
+	#observation_space = spaces.Box(low=0, high=3000, shape = (1,), dtype='int')
+	observation_space = spaces.Box(low=np.array([0,0]), high=np.array([200,200]))
+
+	def __init__(self,mode='gui',simulation_end=7200):
 		self.simulation_end = simulation_end
 		self.mode = mode
 		self.seed()
@@ -60,6 +65,7 @@ class SUMOEnv(Env):
 		self.outID = ['loop10r1l1','loop10r1l2','loop10r1l3', 'loop10r2l1','loop10r2l2','loop10r2l3']
 		self.sumo_running = True
 		self.viewer = None	
+		
 	
 	#Method to set VSL speed limit (VSL per edge)
 	def set_vsl(self, v):
@@ -80,13 +86,14 @@ class SUMOEnv(Env):
 		return np.mean(speed)
 	def calc_bottlespeed2(self):
 		speed = []
+		edgeSpeed = traci.edge.getLastStepMeanSpeed("141131874")
 		for detector in self.bottleneck_detector2:
 			dspeed = traci.inductionloop.getLastStepMeanSpeed(detector)
 			if dspeed < 0:
-				dspeed = 25                                            
+				dspeed = edgeSpeed                                            
                 #The value of no-vehicle signal will affect the value of the reward
 			speed.append(dspeed)
-		return speed
+		return np.mean(speed)
 	#####################  a new round simulation  #################### 
 	def start_new_simulation(self):
 		self.simulation_step = 0
@@ -120,42 +127,55 @@ class SUMOEnv(Env):
 		return tuple(state)
 
 	def get_step_state2(self):
+		state  = []
 		state_occu = []
+		state_vn= []
 		vehicleNumber= traci.edge.getLastStepVehicleNumber("141131874")
-		print(f"edge:141131874;  LastStepVehicleNumber: {vehicleNumber}")
+		edgeOccupancy= traci.edge.getLastStepOccupancy("141131874")
+		#print(f"edge:141131874;  LastStepVehicleNumber: {vehicleNumber}")
 		for detector in self.state_detector1:
 			occup = traci.inductionloop.getLastStepOccupancy(detector)
-			if occup == -1:
-				occup = 0
-			print(f"detector 141131874:{detector}:  LastStepOccupancy: {occup}")
+			vn = traci.inductionloop.getLastStepVehicleNumber(detector)
+			if occup == 0 and edgeOccupancy == 0:
+				occup = 1
+			elif occup == 0 and edgeOccupancy >0:
+				occup = edgeOccupancy
+			if vn == 0 and vehicleNumber == 0:
+				vn = 1
+			elif vn == 0 and vehicleNumber > 0:
+				vn = vehicleNumber
+			#print(f"detector 141131874:{detector}:  LastStepOccupancy: {occup}")
+			#print(f"detector 141131874:{detector}:  getLastStepVehicleNumber: {vn}")
 			state_occu.append(occup)
-			if(occup > 0):
-				state_occu.append(occup)
-		return np.mean(np.array(state_occu))
+			state_vn.append(vn)
+		meanvn = np.mean(np.array(state_vn))
+		meanocc= np.mean(np.array(state_occu))
+		state.append(meanvn)
+		state.append(meanocc)
+		#return np.array([meanvn] ,[meanvn])
+		return state
 	
 	def reset(self):
 		"""
         Function to reset the simulation and return the observation
         """
 		self.start_new_simulation()
-		return self.get_step_state1()
+		return self.get_step_state2()
 	
 	def close(self):
 		traci.close()
 
 	def render(self, mode='gui', close=False):
 
-		if self.mode == "gui":
-			img = imread(os.path.join(os.path.dirname(os.path.realpath(__file__)),'sumo.png'), 1)
-			if mode == 'rgb_array':
-				return img
-			elif mode == 'human':
-				from gym.envs.classic_control import rendering
-				if self.viewer is None:
-					self.viewer = rendering.SimpleImageViewer()
-				self.viewer.imshow(img)
-		else:
+		if self.mode != "gui":
 			raise NotImplementedError("Only rendering in GUI mode is supported")
+			#img = imread(os.path.join(os.path.dirname(os.path.realpath(__file__)),'sumo.png'), 1)
+			#from gym.envs.classic_control import rendering
+			#if self.viewer is None:
+			#	self.viewer = rendering.SimpleImageViewer()
+			#self.viewer.imshow(img)
+		#else:
+			#raise NotImplementedError("Only rendering in GUI mode is supported")
 
 	#def calc_outflow(self):
 	#	state = []
@@ -169,7 +189,7 @@ class SUMOEnv(Env):
 	#	return np.sum(np.array(state)) - np.sum(np.array(statef))
 
 	def get_reward(self):
-		bspeed = self.calc_bottlespeed1()
+		bspeed = self.calc_bottlespeed2()
 		#reward = np.mean(np.array(bspeed))
 		reward = bspeed
 		print(f"reward: {reward}")
@@ -187,9 +207,10 @@ class SUMOEnv(Env):
 		done = False
 		traci.simulationStep()
 		self.simulation_step += 1
-		state_overall =self.get_step_state1()	
+		state_overall =self.get_step_state2()	
+		observation_space = state_overall
 		reward = self.get_reward()
-		if reward >= 28:
+		if reward > 50:
 			done = True
 			print(f"done true!")
 		return state_overall, reward, done, self.simulation_step
@@ -197,11 +218,11 @@ class SUMOEnv(Env):
 	def initSimulator(self,withGUI,portnum):
 		# Path to the sumo binary
 		if withGUI:
-			sumoBinary = "C://Program Files (x86)/Eclipse/Sumo/bin/sumo-gui.exe"
+			sumoBinary = "/opt/homebrew/opt/sumo/share/sumo/bin/sumo-gui"
 		else:
-			sumoBinary = "C://Program Files (x86)/Eclipse/Sumo/bin/sumo.exe"
+			sumoBinary = "/opt/homebrew/opt/sumo/share/sumo/bin/sumo-gui"
 
-		sumoConfig = "C://PHD/Workspace/gym_sumo_vsl_maroc/gym_sumo/envs/sumo_configs/maroc.sumocfg"
+		sumoConfig = "/users/asmae/Desktop/PHD/rl_vsl_sumo/rl_vsl_sumo/gym_sumo/envs/sumo_configs/maroc.sumocfg"
 
 		# Call the sumo simulator
 		#from subprocess import run, PIPE
