@@ -36,18 +36,13 @@ class QLAgent:
     def learn(self, next_state, reward, done=False):
         next_state= self.preprocess_state(next_state)
         state= self.preprocess_state(self.state)      
-        #if next_state not in self.q_table:
-        #  self.q_table[next_state,:] = [0 for _ in range(self.action_space.size)]
         s = state
         s1 = next_state
         a = self.action
         index_action= np.where(self.action_space == a) 
-        #print(self.q_table[s][index_action])
         temp= reward + self.gamma * max(self.q_table[s1])
-        #print(temp)
-        self.q_table[s][index_action] = self.q_table[s][index_action] + self.alpha * (temp-self.q_table[s][index_action])
-        #self.plot_q_table(self.q_table)
-        state = s1
+        self.q_table[s][index_action] = self.q_table[s][index_action] + self.alpha * (temp-self.q_table[next_state][index_action])
+        self.state = s1
         self.acc_reward += reward
     
     def create_uniform_grid(low,high, bins=(10,10)):
@@ -58,7 +53,7 @@ class QLAgent:
 
     def discretize(self,sample, grid):
         discretized_sample= []
-        return list(np.digitize(sample, grid))
+        return list(np.digitize(sample_, grid_) for sample_, grid_ in zip(sample, grid))
 
     def plot_q_table(self,q_table):
         q_image = np.max(q_table, axis = 2)

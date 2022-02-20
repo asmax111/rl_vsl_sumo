@@ -19,6 +19,7 @@ class EpsilonGreedy:
         else:
             print("maximizing action")
             index_action = np.argmax(q_table[state])
+            print(q_table[state])
             action = action_space[index_action]
 
         self.epsilon = max(self.epsilon*self.decay, self.min_epsilon)
