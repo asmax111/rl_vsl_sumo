@@ -10,8 +10,8 @@ from string import Template
 import numpy as np
 import math
 import time
-from cv2 import imread,imshow,resize
-import cv2
+#from cv2 import imread,imshow,resize
+#import cv2
 from collections import namedtuple
 import traci.constants as tc
 
@@ -72,7 +72,9 @@ class SUMOEnv(Env):
 		#number_of_edges = len(self.VSLlist)
 		#for j in range(number_of_edges):
 		#	traci.edge.setMaxSpeed(self.VSLlist[j], v[j])
-		traci.edge.setMaxSpeed("141130184", v)
+		speed = action_space[v]
+		print(f"speed chosen = {speed}")
+		traci.edge.setMaxSpeed("141130184", action_space[v])
 
 	def calc_bottlespeed1(self):
 		speed = []
@@ -205,15 +207,17 @@ class SUMOEnv(Env):
 		self.set_vsl(v)
 		self.sumo_step +=1
 		done = False
+		info={}
 		traci.simulationStep()
 		self.simulation_step += 1
-		state_overall =self.get_step_state2()	
+		state_overall =self.get_step_state2()
+		print(f"State : {state_overall}")	
 		observation_space = state_overall
 		reward = self.get_reward()
-		if reward > 50:
+		if reward > 33:
 			done = True
 			print(f"done true!")
-		return state_overall, reward, done, self.simulation_step
+		return state_overall, reward, done, info
 
 	def initSimulator(self,withGUI,portnum):
 		# Path to the sumo binary
