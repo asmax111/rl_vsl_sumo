@@ -86,10 +86,14 @@ class SUMOEnv(Env):
 				dspeed = edgeSpeed                                            
                 #The value of no-vehicle signal will affect the value of the reward
 			speed.append(dspeed)
-		return np.mean(speed)
+		if not speed:
+			return edgeSpeed
+		s= np.mean(speed)
+		print(f"bspeed: {s}")
+		return s
 	def start_new_simulation(self):
 		self.simulation_step = 0
-		sumoCmd = [sumoBinary, "-c", sumoConfig, "--start"]
+		sumoCmd = [sumoBinary, "-c", sumoConfig, "--quit-on-end", "true", "--start"]
 		traci.start(sumoCmd)
 	def get_step_state1(self):
 		state_occu = []
@@ -120,13 +124,16 @@ class SUMOEnv(Env):
 		vehicles =  traci.vehicle.getIDList()
 		ttc =[]
 		for vehicle in vehicles:
-			vehcileSpeed = traci.vehicle.getSpeed(vehicle)
-			vehicleTtc= traci.vehicle.getParameter(vehicle, "device.ssm.minTTC")
-			#print(f"Vehicle id :{vehicle}, speed: {vehcileSpeed}, TTC: {vehicleTtc}")
-			if(vehicleTtc != ''):
-				if(float(vehicleTtc) < 1000):
-					ttc.append(float(vehicleTtc))
-		#print(f"TTC: {ttc}")
+			if(traci.vehicle.getRoadID(vehicle) == "141131874"):
+				vehcileSpeed = traci.vehicle.getSpeed(vehicle)
+				vehicleTtc= traci.vehicle.getParameter(vehicle, "device.ssm.minTTC")
+				#print(f"Vehicle id :{vehicle}, speed: {vehcileSpeed}, TTC: {vehicleTtc}")
+				if(vehicleTtc != ''):
+					if(float(vehicleTtc) < 1000):
+						ttc.append(float(vehicleTtc))
+		print(f"TTC: {ttc}")
+		if not ttc:
+			return 0
 		return np.mean(ttc)
 	def get_step_state2(self):
 		state  = []
@@ -197,7 +204,7 @@ class SUMOEnv(Env):
 		reward = 0
 		bspeed = self.calc_bottlespeed2()
 		avgTtc = self.get_average_ttc()
-		if(bspeed != 0 or bspeed != 1):
+		if(bspeed >=20):
 			reward = avgTtc
 		else:
 			reward = avgTtc - avgTtc * 0.1 #penalty of 10%
