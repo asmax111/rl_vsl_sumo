@@ -1,3 +1,4 @@
+from audioop import avg
 from turtle import st
 from gym import Env
 from gym import error, spaces, utils
@@ -17,19 +18,19 @@ import traci.constants as tc
 
 import os, sys, subprocess
 action_space= np.array([19, 22, 25, 28, 31, 33])
-#observation_space = spaces.Tuple([spaces.Box(0,100, shape=(1,), dtype='float'),spaces.Box(0,3000, shape=(1,), dtype='float')])
-observation_space = spaces.Box(low=np.array([0,0]), high=np.array([3000,50]))
-sumoConfig = "/users/asmae/Desktop/PHD/rl_vsl_sumo/rl_vsl_sumo/gym_sumo/envs/sumo_configs/maroc.sumocfg"
-sumoBinary = "/opt/homebrew/opt/sumo/share/sumo/bin/sumo-gui"
+observation_space = spaces.Box(low=np.array([0,0]), high=np.array([1,1]))
+#paths to sumo binary and sumo configs
+sumoConfig = "./sumo_configs/maroc.sumocfg"
+sumoBinary = "C:/Users/rhanizar/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/SUMO/sumo-gui"
 class SUMOEnv(Env):
 	metadata = {'render.modes': ['human', 'rgb_array','state_pixels']}
 	#Discrete speeds for VSL
-	action_space= np.array([19, 22, 25, 28, 31, 33])
-	#observation_space = spaces.Tuple([spaces.Box(0,100, shape=(1,), dtype='float'),spaces.Box(0,3000, shape=(1,), dtype='float')])
-	#observation_space = spaces.Box(low=0, high=3000, shape = (1,), dtype='int')
-	observation_space = spaces.Box(low=np.array([0,0]), high=np.array([200,200]))
-
+	actions= np.array([19, 22, 25, 28, 31, 33])
+	action_space = spaces.Discrete(len(actions))
+	observation_space = spaces.Box(low=np.array([0,0]), high=np.array([1,1]))
 	def __init__(self,mode='gui',simulation_end=7200):
+		self.action_space = action_space
+		self.observation_space = observation_space
 		self.simulation_end = simulation_end
 		self.mode = mode
 		self.seed()
@@ -64,16 +65,11 @@ class SUMOEnv(Env):
 		self.inID = ['loop1r1l1','loop1r1l2','loop1r1l3','loop1r2l1','loop1r2l2','loop1r2l3']
 		self.outID = ['loop10r1l1','loop10r1l2','loop10r1l3', 'loop10r2l1','loop10r2l2','loop10r2l3']
 		self.sumo_running = True
-		self.viewer = None	
-		
-	
-	#Method to set VSL speed limit (VSL per edge)
+		self.viewer = None		
 	def set_vsl(self, v):
-		#number_of_edges = len(self.VSLlist)
-		#for j in range(number_of_edges):
-		#	traci.edge.setMaxSpeed(self.VSLlist[j], v[j])
-		traci.edge.setMaxSpeed("141130184", v)
-
+		speed = action_space[v]
+		#print(f"speed chosen = {speed}")
+		traci.edge.setMaxSpeed("141131874", action_space[v])
 	def calc_bottlespeed1(self):
 		speed = []
 		edgeSpeed = traci.edge.getLastStepMeanSpeed("141130184")
@@ -93,14 +89,15 @@ class SUMOEnv(Env):
 				dspeed = edgeSpeed                                            
                 #The value of no-vehicle signal will affect the value of the reward
 			speed.append(dspeed)
-		return np.mean(speed)
-	#####################  a new round simulation  #################### 
+		if not speed:
+			return edgeSpeed
+		s= np.mean(speed)
+		#print(f"bspeed: {s}")
+		return s
 	def start_new_simulation(self):
 		self.simulation_step = 0
-		sumoCmd = [sumoBinary, "-c", sumoConfig, "--start"]
+		sumoCmd = [sumoBinary, "-c", sumoConfig, "--quit-on-end", "true", "--start"]
 		traci.start(sumoCmd)
-
-
 	def get_step_state1(self):
 		state_occu = []
 		state_flow = []
@@ -122,10 +119,25 @@ class SUMOEnv(Env):
 				state_flow.append(vehicleNumber)	
 		state.append(np.mean(state_occu))
 		state.append(np.mean(state_flow))
-		print(f"state= {tuple(state)}")
+		#print(f"state= {tuple(state)}")
 		observation_space= tuple(state)
 		return tuple(state)
-
+	# A smaller TTC indicates a more dangerous traffic condition
+	def get_average_ttc(self):
+		vehicles =  traci.vehicle.getIDList()
+		ttc =[]
+		for vehicle in vehicles:
+			if(traci.vehicle.getRoadID(vehicle) == "141131874"):
+				vehcileSpeed = traci.vehicle.getSpeed(vehicle)
+				vehicleTtc= traci.vehicle.getParameter(vehicle, "device.ssm.minTTC")
+				#print(f"Vehicle id :{vehicle}, speed: {vehcileSpeed}, TTC: {vehicleTtc}")
+				if(vehicleTtc != ''):
+					if(float(vehicleTtc) < 1000):
+						ttc.append(float(vehicleTtc))
+		#print(f"TTC: {ttc}")
+		if not ttc:
+			return 0
+		return np.mean(ttc)
 	def get_step_state2(self):
 		state  = []
 		state_occu = []
@@ -154,51 +166,56 @@ class SUMOEnv(Env):
 		state.append(meanocc)
 		#return np.array([meanvn] ,[meanvn])
 		return state
-	
+	def get_state_cible(self):
+		state  = []
+		speed = []
+		vehicleNumber = []
+		flowState = 0
+		meanSpeedState = 0
+		jamFlow = 0.42 # 3000 vehicle per hour => 0.42 vehicle per 0.5 s
+		freeFlowSpeed = 33 #free flow speed
+
+		#vehicleNumber= traci.edge.getLastStepVehicleNumber("141131874")
+		for detector in self.state_detector1:
+			vn = traci.inductionloop.getLastStepVehicleNumber(detector)
+			vehicleNumber.append(vn)
+		flowState = np.mean(vehicleNumber)/jamFlow
+
+		for detector in self.bottleneck_detector2:
+			dspeed = traci.inductionloop.getLastStepMeanSpeed(detector)
+			if dspeed > 0:
+				speed.append(dspeed)
+			else:
+				speed.append(0)
+		if(np.mean(speed) > 0):
+			meanSpeedState = np.mean(speed)/freeFlowSpeed	
+		state.append(flowState)
+		state.append(meanSpeedState)
+		return state	
 	def reset(self):
 		"""
         Function to reset the simulation and return the observation
         """
 		self.start_new_simulation()
-		return self.get_step_state2()
-	
+		return self.get_state_cible()	
 	def close(self):
 		traci.close()
-
 	def render(self, mode='gui', close=False):
-
 		if self.mode != "gui":
 			raise NotImplementedError("Only rendering in GUI mode is supported")
-			#img = imread(os.path.join(os.path.dirname(os.path.realpath(__file__)),'sumo.png'), 1)
-			#from gym.envs.classic_control import rendering
-			#if self.viewer is None:
-			#	self.viewer = rendering.SimpleImageViewer()
-			#self.viewer.imshow(img)
-		#else:
-			#raise NotImplementedError("Only rendering in GUI mode is supported")
-
-	#def calc_outflow(self):
-	#	state = []
-	#	statef = []
-	#	for detector in self.outID:
-	#		veh_num = traci.inductionloop.getLastStepVehicleNumber(detector)
-	#		state.append(veh_num)
-	#	for detector in self.inID:
-	#		veh_num = traci.inductionloop.getLastStepVehicleNumber(detector)
-	#		statef.append(veh_num)
-	#	return np.sum(np.array(state)) - np.sum(np.array(statef))
-
 	def get_reward(self):
+		reward = 0
 		bspeed = self.calc_bottlespeed2()
-		#reward = np.mean(np.array(bspeed))
-		reward = bspeed
-		print(f"reward: {reward}")
+		avgTtc = self.get_average_ttc()
+		if(bspeed >=18):
+			reward = 0.2*(bspeed/25) + 0.8*(avgTtc/5) # accepted bottleneck speed = 25 / accepted TTC  = 5s 
+		else:
+			reward =  0.6*(bspeed/25) + 0.4*(avgTtc/5) #Inverser les pondérations pour les vitesses inférieures à 70 sur le bottlneck section
+		#print(f"reward: {reward}")
 		return reward
-
 	def seed(self, seed=None):
 		self.np_random, seed = seeding.np_random(seed)
 		return [seed]
-
 	def step(self,v):
 		state_overall = 0
 		reward = 0
@@ -208,32 +225,21 @@ class SUMOEnv(Env):
 		info={}
 		traci.simulationStep()
 		self.simulation_step += 1
-		state_overall =self.get_step_state2()
-		print(f"State : {state_overall}")	
-		observation_space = state_overall
+		state_overall =self.get_state_cible()
+		#print(f"State : {state_overall}")	
+		self.observation_space = state_overall
 		reward = self.get_reward()
-		if reward > 33:
+		if reward > 500:
 			done = True
 			print(f"done true!")
 		return state_overall, reward, done, info
-
 	def initSimulator(self,withGUI,portnum):
 		# Path to the sumo binary
 		if withGUI:
-			sumoBinary = "/opt/homebrew/opt/sumo/share/sumo/bin/sumo-gui"
+			sumoBinary = "C:/Users/rhanizar/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/SUMO/sumo-gui"
 		else:
-			sumoBinary = "/opt/homebrew/opt/sumo/share/sumo/bin/sumo-gui"
+			sumoBinary = "C:/Users/rhanizar/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/SUMO/sumo-gui"
 
 		sumoConfig = "/users/asmae/Desktop/PHD/rl_vsl_sumo/rl_vsl_sumo/gym_sumo/envs/sumo_configs/maroc.sumocfg"
-
-		# Call the sumo simulator
-		#from subprocess import run, PIPE
-		
-		#sumoProcess = subprocess.run([sumoBinary, "-c", sumoConfig], stdout=PIPE)
-		#traci.start([sumoBinary, "-c", sumoConfig], label= "sim")
-		# Initialize the simulation
-		#traci.init(portnum)
-		# run a single step
-		#traci.simulationStep()
 		return traci
 

@@ -33,17 +33,14 @@ jupyter_console
 jupyter_core
 jupyterlab_pygments
 jupyterlab_widgets
+keras-rl2
 kiwisolver
 libopencv
-libtiff
 markupsafe
 matplotlib
 matplotlib-inline
 mistune
 mkl
-mkl-service
-mkl_fft
-mkl_random
 munkres
 nbclient
 nbconvert
@@ -70,7 +67,7 @@ pyopengl
 pyparsing
 pyrsistent
 python-dateutil
-pytorch
+torch
 pytz
 pywinpty
 pyzmq
@@ -82,6 +79,7 @@ send2trash
 setuptools
 sip
 six
+tensorflow
 terminado
 testpath
 threadpoolctl
@@ -102,3 +100,4 @@ gym
 pyglet
 scipy
 sumo-rl
+stable_baselines3

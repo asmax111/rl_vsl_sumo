@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 				<!-- The sumo configuration file used when running the experiment -->
 				<configuration>
+				
+					<device.ssm.deterministic value="true"/>
+    				<device.ssm.file value="ssm.xml"/>
+    				<device.ssm.measures value="TTC"/>
 
 				    <input>
 				        <net-file value="map3.net.xml"/>
@@ -13,9 +17,9 @@
 						<step-length value="0.5"/>
 				    </time>
 
-					<!--<output>
+					<output>
 						<summary-output value="output_sumo.xml"/>
-					</output>-->
+					</output>
 				    <random-number>
 				        <random value="true"/>
 				    </random-number>

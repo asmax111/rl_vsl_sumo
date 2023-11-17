@@ -1,0 +1,26 @@
+***Starting server on port 58186 ***
+Loading net-file from 'C://PHD//RL_VSL_2023//rl_vsl_sumo//gym_sumo//envs//sumo_configs//map3.net.xml' ... done (16ms).
+Loading additional-files from 'C://PHD//RL_VSL_2023//rl_vsl_sumo//gym_sumo//envs//sumo_configs//map3.det.xml' ... done (4ms).
+Loading done.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.thresholds'. Using default of ''.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.trajectories'. Using default of '0'.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.range'. Using default of '50.00'.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.extratime'. Using default of '5.00'.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.geo'. Using default of '0'.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.write-positions'. Using default of '0'.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.write-positions'. Using default of '0'.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.exclude-conflict-types'. Using default of ''.
+Warning: Undefined end for flow 'flow0', defaulting to 24hour duration.
+Warning: Undefined end for flow 'flow1', defaulting to 24hour duration.
+Simulation started with time: 0.00.
+Simulation ended at time: 21.50
+Performance: 
+ Duration: 1.64s
+ TraCI-Duration: 0.78s
+ Real time factor: 13.1178
+ UPS: 535.082367
+Vehicles: 
+ Inserted: 38
+ Running: 38
+ Waiting: 0
+

@@ -11,23 +11,39 @@ from string import Template
 import numpy as np
 import math
 import time
-#from cv2 import imread,imshow,resize
-#import cv2
 from collections import namedtuple
 import traci.constants as tc
-
 import os, sys, subprocess
-action_space= np.array([19, 22, 25, 28, 31, 33])
+import json
+
+actions= np.array([19, 22, 25, 28, 31, 33])
 observation_space = spaces.Box(low=np.array([0,0]), high=np.array([1,1]))
 #paths to sumo binary and sumo configs
-sumoConfig = "/users/asmae/Desktop/PHD/rl_vsl_sumo/rl_vsl_sumo/gym_sumo/envs/sumo_configs/maroc.sumocfg"
-sumoBinary = "/opt/homebrew/opt/sumo/share/sumo/bin/sumo-gui"
+sumoConfig = "C://PHD//RL_VSL_2023//rl_vsl_sumo//gym_sumo//envs//sumo_configs//maroc.sumocfg"
+sumoBinary = "C://Program Files (x86)//Eclipse//Sumo//bin//sumo-gui.exe"
+tttList= []
+co2List=[]
+ttc=[]
+my_dictionary = {}
+my_dictionary_ms = {}
 class SUMOEnv(Env):
 	metadata = {'render.modes': ['human', 'rgb_array','state_pixels']}
 	#Discrete speeds for VSL
-	action_space= np.array([19, 22, 25, 28, 31, 33])
+	actions= np.array([19, 22, 25, 28, 31, 33])
 	observation_space = spaces.Box(low=np.array([0,0]), high=np.array([1,1]))
+	tttList= []
+	co2List=[]
+	simulation_step = 0
 	def __init__(self,mode='gui',simulation_end=7200):
+		# Define the action space using the Discrete class
+		self.action_space = spaces.Discrete(len(actions))
+    	# Create a custom mapping from action index to value
+		self.action_mapping = {i: value for i, value in enumerate(actions)}
+		for action_index in range(self.action_space.n):
+			action_value = self.action_mapping[action_index]
+			#print("Action value at index", action_index, ":", action_value)
+
+		self.observation_space = observation_space
 		self.simulation_end = simulation_end
 		self.mode = mode
 		self.seed()
@@ -64,9 +80,11 @@ class SUMOEnv(Env):
 		self.sumo_running = True
 		self.viewer = None		
 	def set_vsl(self, v):
-		speed = action_space[v]
-		print(f"speed chosen = {speed}")
-		traci.edge.setMaxSpeed("141131874", action_space[v])
+		#speed = action_space[v]
+		speed =self.action_mapping[v]
+		#print(f"speed chosen = {speed}")
+		#traci.edge.setMaxSpeed("141131874", action_space[v])
+		traci.edge.setMaxSpeed("141131874", self.action_mapping[v])
 	def calc_bottlespeed1(self):
 		speed = []
 		edgeSpeed = traci.edge.getLastStepMeanSpeed("141130184")
@@ -89,11 +107,18 @@ class SUMOEnv(Env):
 		if not speed:
 			return edgeSpeed
 		s= np.mean(speed)
-		print(f"bspeed: {s}")
+		#print(f"bspeed: {s}")
 		return s
+	def getAverageTtt(self):
+		edgeTtt = traci.edge.getTraveltime("141131874")
+		return edgeTtt
+	def getCO2Emission(self):
+		edgeCo2 = traci.edge.getCO2Emission("141131874")
+		return edgeCo2
 	def start_new_simulation(self):
 		self.simulation_step = 0
-		sumoCmd = [sumoBinary, "-c", sumoConfig, "--quit-on-end", "true", "--start"]
+		logConfig = "C://PHD//RL_VSL_2023//rl_vsl_sumo//gym_sumo//envs//results//logsumo.txt"
+		sumoCmd = [sumoBinary, "-c", sumoConfig, "--quit-on-end", "true",  "--log", logConfig, "--start"]
 		traci.start(sumoCmd)
 	def get_step_state1(self):
 		state_occu = []
@@ -116,7 +141,7 @@ class SUMOEnv(Env):
 				state_flow.append(vehicleNumber)	
 		state.append(np.mean(state_occu))
 		state.append(np.mean(state_flow))
-		print(f"state= {tuple(state)}")
+		#print(f"state= {tuple(state)}")
 		observation_space= tuple(state)
 		return tuple(state)
 	# A smaller TTC indicates a more dangerous traffic condition
@@ -131,7 +156,7 @@ class SUMOEnv(Env):
 				if(vehicleTtc != ''):
 					if(float(vehicleTtc) < 1000):
 						ttc.append(float(vehicleTtc))
-		print(f"TTC: {ttc}")
+		#print(f"TTC: {ttc}")
 		if not ttc:
 			return 0
 		return np.mean(ttc)
@@ -196,6 +221,10 @@ class SUMOEnv(Env):
 		self.start_new_simulation()
 		return self.get_state_cible()	
 	def close(self):
+		with open("ttc_log.txt", "w") as fp:
+			json.dump(my_dictionary, fp)  
+		with open("ms_log.txt", "w") as fp:
+			json.dump(my_dictionary_ms, fp)  
 		traci.close()
 	def render(self, mode='gui', close=False):
 		if self.mode != "gui":
@@ -204,16 +233,25 @@ class SUMOEnv(Env):
 		reward = 0
 		bspeed = self.calc_bottlespeed2()
 		avgTtc = self.get_average_ttc()
-		if(bspeed >=20):
-			reward = avgTtc
+		my_dictionary[self.simulation_step] = avgTtc
+		my_dictionary_ms[self.simulation_step] = bspeed
+		if (avgTtc > 10): avgTtc = 10
+		#print(f"average ttc :{avgTtc}")
+		if(bspeed >=18 and avgTtc < 5):
+			reward = 0.5*(bspeed-25) + 0.5*(avgTtc-5) # accepted bottleneck speed = 25 / accepted TTC  = 5s 
+		elif(bspeed >=18 and avgTtc >= 5):
+			reward =  0.2*(bspeed-25) + 0.8*(avgTtc-5) #Inverser les pondérations pour les vitesses inférieures à 70 sur le bottlneck section
+		elif(bspeed < 18 and avgTtc < 5):
+			reward =  0.8*(bspeed-25) + 0.2*(avgTtc-5) #Inverser les pondérations pour les vitesses inférieures à 70 sur le bottlneck section
 		else:
-			reward = avgTtc - avgTtc * 0.1 #penalty of 10%
-		print(f"reward: {reward}")
+			reward = avgTtc-5 # accepted bottleneck speed = 25 / accepted TTC  = 5s 
+		#print(f"reward: {reward}")
 		return reward
 	def seed(self, seed=None):
 		self.np_random, seed = seeding.np_random(seed)
 		return [seed]
 	def step(self,v):
+		#print(v)
 		state_overall = 0
 		reward = 0
 		self.set_vsl(v)
@@ -223,20 +261,34 @@ class SUMOEnv(Env):
 		traci.simulationStep()
 		self.simulation_step += 1
 		state_overall =self.get_state_cible()
-		print(f"State : {state_overall}")	
+		#print(f"State : {state_overall}")	
 		self.observation_space = state_overall
+		ttt= self.getAverageTtt()
+		tttList.append(ttt)
+		co2 = self.getCO2Emission()
+		co2List.append(co2)
+		#print(f"Average TTT: {ttt}. Average CO2 emission: {co2}")
 		reward = self.get_reward()
-		if reward > 500:
+		if reward > 1000:
 			done = True
 			print(f"done true!")
 		return state_overall, reward, done, info
 	def initSimulator(self,withGUI,portnum):
 		# Path to the sumo binary
 		if withGUI:
-			sumoBinary = "/opt/homebrew/opt/sumo/share/sumo/bin/sumo-gui"
+			sumoBinary = "C://Program Files (x86)//Eclipse//Sumo//bin//sumo-gui.exe"
 		else:
-			sumoBinary = "/opt/homebrew/opt/sumo/share/sumo/bin/sumo-gui"
+			sumoBinary = "C://Program Files (x86)//Eclipse//Sumo//bin//sumo-gui.exe"
 
 		sumoConfig = "/users/asmae/Desktop/PHD/rl_vsl_sumo/rl_vsl_sumo/gym_sumo/envs/sumo_configs/maroc.sumocfg"
 		return traci
-
+	def getAverageTttList(self):
+		if(len(tttList) != 0):
+			averageTtt = sum(tttList) / len(tttList)
+			return averageTtt
+		return 0
+	def getAverageCo2List(self):
+		if(len(self.co2List) != 0):
+			averageCo2 = sum(co2List) / len(co2List)
+			return averageCo2
+		return 0

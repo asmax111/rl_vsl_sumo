@@ -1,0 +1,27 @@
+***Starting server on port 61141 ***
+Loading net-file from 'C://PHD//RL_VSL_2023//rl_vsl_sumo//gym_sumo//envs//sumo_configs//map3.net.xml' ... done (86ms).
+Loading additional-files from 'C://PHD//RL_VSL_2023//rl_vsl_sumo//gym_sumo//envs//sumo_configs//map3.det.xml' ... done (54ms).
+Loading done.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.thresholds'. Using default of ''.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.trajectories'. Using default of '0'.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.range'. Using default of '50.00'.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.extratime'. Using default of '5.00'.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.geo'. Using default of '0'.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.write-positions'. Using default of '0'.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.write-positions'. Using default of '0'.
+Vehicle 'veh1' does not supply vehicle parameter 'device.ssm.exclude-conflict-types'. Using default of ''.
+Warning: Undefined end for flow 'flow0', defaulting to 24hour duration.
+Warning: Undefined end for flow 'flow1', defaulting to 24hour duration.
+Simulation started with time: 0.00.
+Simulation ended at time: 3500.00
+Reason: TraCI requested termination.
+Performance: 
+ Duration: 701.73s
+ TraCI-Duration: 304.37s
+ Real time factor: 4.98771
+ UPS: 690.877480
+Vehicles: 
+ Inserted: 5836
+ Running: 69
+ Waiting: 0
+

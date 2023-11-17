@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-11-17 00:48:29 by Eclipse SUMO GUI Version 1.18.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="C://PHD//RL_VSL_2023//rl_vsl_sumo//gym_sumo//envs//sumo_configs//map3.net.xml"/>
+        <route-files value="C://PHD//RL_VSL_2023//rl_vsl_sumo//gym_sumo//envs//sumo_configs//map3.rou.xml"/>
+        <additional-files value="C://PHD//RL_VSL_2023//rl_vsl_sumo//gym_sumo//envs//sumo_configs//map3.det.xml"/>
+    </input>
+
+    <output>
+        <summary-output value="C://PHD//RL_VSL_2023//rl_vsl_sumo//gym_sumo//envs//sumo_configs//output_sumo.xml"/>
+    </output>
+
+    <time>
+        <step-length value="0.5"/>
+    </time>
+
+    <report>
+        <log value="C://PHD//RL_VSL_2023//rl_vsl_sumo//gym_sumo//envs//results//logsumo.txt"/>
+    </report>
+
+    <ssm_device>
+        <device.ssm.deterministic value="true"/>
+        <device.ssm.measures value="TTC"/>
+        <device.ssm.file value="ssm.xml"/>
+    </ssm_device>
+
+    <traci_server>
+        <remote-port value="58186"/>
+    </traci_server>
+
+    <random_number>
+        <random value="true"/>
+    </random_number>
+
+    <gui_only>
+        <gui-settings-file value="C://PHD//RL_VSL_2023//rl_vsl_sumo//gym_sumo//envs//sumo_configs//vsl.settings.xml"/>
+        <quit-on-end value="true"/>
+        <start value="true"/>
+    </gui_only>
+
+</configuration>
+-->
+
+<meandata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/meandata_file.xsd">
+    <interval begin="0.00" end="21.50" id="edgeData1">
+        <edge id="-390321573" sampledSeconds="0.00" departed="0" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="-390321613" sampledSeconds="0.00" departed="0" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="-390321650#0" sampledSeconds="0.00" departed="0" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="-390321650#1" sampledSeconds="0.00" departed="0" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="-390321656" sampledSeconds="0.00" departed="0" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="-745383695" sampledSeconds="0.00" departed="0" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="141130184" sampledSeconds="209.50" traveltime="53.74" overlapTraveltime="53.97" density="8.51" laneDensity="2.84" occupancy="1.42" waitingTime="0.00" timeLoss="71.81" speed="21.30" speedRelative="0.64" departed="19" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="141131874" sampledSeconds="210.00" traveltime="72.93" overlapTraveltime="73.24" density="8.33" laneDensity="2.78" occupancy="1.39" waitingTime="0.00" timeLoss="53.57" speed="16.07" speedRelative="0.73" departed="19" arrived="0" entered="0" left="0" laneChangedFrom="3" laneChangedTo="3"/>
+        <edge id="390321573" sampledSeconds="0.00" departed="0" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="390321613" sampledSeconds="0.00" departed="0" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="390321650#0" sampledSeconds="0.00" departed="0" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="390321650#1" sampledSeconds="0.00" departed="0" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="390321656" sampledSeconds="0.00" departed="0" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="745383695" sampledSeconds="0.00" departed="0" arrived="0" entered="0" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+    </interval>
+</meandata>

@@ -4,11 +4,13 @@
 	<vehicle id="veh1" type="type1" depart="0">
 		<param key="has.ssm.device" value="true"/>
 		<param key="device.ssm.measures" value="TTC DRAC PET"/>
+		<param key="device.ssm.file" value="ssm_flow.xml" />
 		<route edges="141130184"/>
 	</vehicle>
 	<vehicle id="veh2" type="type1" depart="0">
 		<param key="has.ssm.device" value="true"/>
 		<param key="device.ssm.measures" value="TTC DRAC PET"/>
+		<param key="device.ssm.file" value="ssm_flow.xml" />
 		<route edges="141131874 "/>
 	</vehicle>
 	<!-- Route distribution -->
@@ -17,12 +19,14 @@
 
 	<!-- Traffic Flow -->
 	<flow id="flow0" begin="0" type="type1" vehsPerHour = "3000" route="route0" departSpeed="random" departLane="random">
-		<param key="has.ssm.device" value="true"/>
+		<param key="has.ssm.device" value="true" />
 		<param key="device.ssm.measures" value="TTC DRAC PET"/>
+		<param key="device.ssm.file" value="ssm_flow_ttc.xml" />
 	</flow> 
 	<flow id="flow1" begin="0" type="type1" vehsPerHour = "3000" route="route1" departSpeed="random" departLane="random">
 		<param key="has.ssm.device" value="true"/>
 		<param key="device.ssm.measures" value="TTC DRAC PET"/>
+		<param key="device.ssm.file" value="ssm_flow_ttc.xml" />
 	</flow> 
 
 </routes>
